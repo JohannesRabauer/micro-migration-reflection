@@ -5,8 +5,6 @@ import java.util.TreeSet;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 import de.johannes_rabauer.micromigration.MicroMigrationScript;
 
