@@ -6,7 +6,7 @@ import java.util.TreeSet;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
-import de.johannes_rabauer.micromigration.MicroMigrationScript;
+import de.johannes_rabauer.micromigration.scripts.MicroMigrationScript;
 
 /**
  * Executes all the available scripts to migrate the datastore to a certain version.
