@@ -6,12 +6,12 @@ import java.util.TreeSet;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
-import de.johannes_rabauer.micromigration.scripts.MicroMigrationScript;
+import de.johannes_rabauer.micromigration.scripts.MigrationScript;
 
 /**
  * Executes all the available scripts to migrate the datastore to a certain version.
  * <p>
- * This class searches all implementation of {@link MicroMigrationScript} in the specified package 
+ * This class searches all implementation of {@link MigrationScript} in the specified package 
  * then includes in the migration process.
  * 
  * @author Johannes Rabauer
@@ -19,20 +19,20 @@ import de.johannes_rabauer.micromigration.scripts.MicroMigrationScript;
  */
 public class ReflectiveMigrater implements MicroMigrater
 {
-	private final TreeSet<MicroMigrationScript> sortedScripts = new TreeSet<>(MicroMigrationScript.COMPARATOR);
+	private final TreeSet<MigrationScript> sortedScripts = new TreeSet<>(MigrationScript.COMPARATOR);
 	
 	public ReflectiveMigrater(final String packagePath) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		final Reflections reflections = new Reflections(packagePath, new SubTypesScanner(false));
 		
-		for (Class<? extends MicroMigrationScript> script : reflections.getSubTypesOf(MicroMigrationScript.class)) 
+		for (Class<? extends MigrationScript> script : reflections.getSubTypesOf(MigrationScript.class)) 
 		{
 			this.sortedScripts.add(script.getDeclaredConstructor().newInstance());
 		}
 	}
 
 	@Override
-	public TreeSet<MicroMigrationScript> getSortedScripts() {
+	public TreeSet<MigrationScript> getSortedScripts() {
 		return this.sortedScripts;
 	}
 }
