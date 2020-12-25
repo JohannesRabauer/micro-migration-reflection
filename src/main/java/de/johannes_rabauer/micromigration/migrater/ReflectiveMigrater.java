@@ -17,10 +17,11 @@ import de.johannes_rabauer.micromigration.scripts.MigrationScript;
  * @author Johannes Rabauer
  * 
  */
-public class ReflectiveMigrater implements MicroMigrater
+public class ReflectiveMigrater extends AbstractMigrater
 {
-	private final TreeSet<MigrationScript> sortedScripts = new TreeSet<>(MigrationScript.COMPARATOR);
+	private final TreeSet<MigrationScript<?>> sortedScripts = new TreeSet<>(MigrationScript.COMPARATOR);
 	
+	@SuppressWarnings("rawtypes")
 	public ReflectiveMigrater(final String packagePath) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		final Reflections reflections = new Reflections(packagePath, new SubTypesScanner(false));
@@ -32,7 +33,7 @@ public class ReflectiveMigrater implements MicroMigrater
 	}
 
 	@Override
-	public TreeSet<MigrationScript> getSortedScripts() {
+	public TreeSet<MigrationScript<?>> getSortedScripts() {
 		return this.sortedScripts;
 	}
 }
