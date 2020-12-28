@@ -9,10 +9,10 @@ import org.reflections.scanners.SubTypesScanner;
 import de.johannes_rabauer.micromigration.scripts.MigrationScript;
 
 /**
- * Executes all the available scripts to migrate the datastore to a certain version.
+ * Contains all the available scripts to migrate the datastore to a certain version.
  * <p>
- * This class searches all implementation of {@link MigrationScript} in the specified package 
- * then includes in the migration process.
+ * Searches all implementation of {@link MigrationScript} in the specified package
+ * and it's the sub packages.
  * 
  * @author Johannes Rabauer
  * 
@@ -21,10 +21,20 @@ public class ReflectiveMigrater extends AbstractMigrater
 {
 	private final TreeSet<MigrationScript<?>> sortedScripts = new TreeSet<>(MigrationScript.COMPARATOR);
 	
+	/**
+	 * @param packagePath defines the package in which {@link MigrationScript}s will be searched.
+	 * Also searches through all sub packages of <code>packagePath</code>
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 */
 	@SuppressWarnings("rawtypes")
 	public ReflectiveMigrater(final String packagePath) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
-		final Reflections reflections = new Reflections(packagePath, new SubTypesScanner(false));
+		final Reflections reflections = new Reflections(packagePath, new SubTypesScanner(true));
 		
 		for (Class<? extends MigrationScript> script : reflections.getSubTypesOf(MigrationScript.class)) 
 		{
@@ -33,7 +43,8 @@ public class ReflectiveMigrater extends AbstractMigrater
 	}
 
 	@Override
-	public TreeSet<MigrationScript<?>> getSortedScripts() {
+	public TreeSet<MigrationScript<?>> getSortedScripts() 
+	{
 		return this.sortedScripts;
 	}
 }
