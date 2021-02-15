@@ -24,24 +24,36 @@ public class ReflectiveMigrater extends AbstractMigrater
 	/**
 	 * @param packagePath defines the package in which {@link MigrationScript}s will be searched.
 	 * Also searches through all sub packages of <code>packagePath</code>
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
+	 * @throws ScriptInstantiationException if a class in the given package could not be instantiated
 	 */
 	@SuppressWarnings("rawtypes")
-	public ReflectiveMigrater(final String packagePath) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
+	public ReflectiveMigrater(final String packagePath) throws ScriptInstantiationException 
 	{
-		final Reflections reflections = new Reflections(packagePath, new SubTypesScanner(true));
+		final Reflections reflections = new Reflections(packagePath, new SubTypesScanner());
 		
-		for (Class<? extends MigrationScript> script : reflections.getSubTypesOf(MigrationScript.class)) 
+		for (Class<? extends MigrationScript> scriptClass : reflections.getSubTypesOf(MigrationScript.class)) 
 		{
-			this.sortedScripts.add(script.getDeclaredConstructor().newInstance());
+			this.sortedScripts.add(instanciateClass(scriptClass));
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
+	private MigrationScript<?> instanciateClass(Class<? extends MigrationScript> scriptClass) throws ScriptInstantiationException
+	{
+		try {
+			return scriptClass.getDeclaredConstructor().newInstance();
+		} catch (
+			InstantiationException    | 
+			IllegalAccessException    | 
+			IllegalArgumentException  | 
+			InvocationTargetException | 
+			NoSuchMethodException     | 
+			SecurityException        e
+		) {
+			throw new ScriptInstantiationException("Could not instanciate class " + scriptClass.getName(), e);
+		}
+	}
+	
 	@Override
 	public TreeSet<MigrationScript<?>> getSortedScripts() 
 	{

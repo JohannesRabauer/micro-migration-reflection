@@ -2,15 +2,13 @@ package de.johannes_rabauer.micromigration.migrater;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ReflectiveMigraterTest 
 {
 	@Test
-	void testValidScript() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	void testValidScript() throws ScriptInstantiationException {
 		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.valid");
 		assertEquals(1, migrater.getSortedScripts().size());
 		assertEquals(
@@ -20,7 +18,7 @@ class ReflectiveMigraterTest
 	}
 	
 	@Test
-	void testValidScriptWithIrrelevantClasses() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	void testValidScriptWithIrrelevantClasses() throws ScriptInstantiationException {
 		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.moreClassesIncludingValid");
 		assertEquals(1, migrater.getSortedScripts().size());
 		assertEquals(
@@ -30,7 +28,7 @@ class ReflectiveMigraterTest
 	}
 	
 	@Test
-	void testValidScriptWithSubpackages() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	void testValidScriptWithSubpackages() throws ScriptInstantiationException {
 		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.includeSubPackages");
 		assertEquals(2, migrater.getSortedScripts().size());
 		assertEquals(
@@ -44,29 +42,59 @@ class ReflectiveMigraterTest
 	}
 	
 	@Test
-	void testPackageWithNoScript() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	void testPackageWithNoScript() throws ScriptInstantiationException {
 		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.packageNotExisting");
 		assertEquals(0, migrater.getSortedScripts().size());
 	}
 
 	@Test
-	void testExceptionThrowingScript() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		Assertions.assertThrows(InvocationTargetException.class, () -> {
+	void testExceptionThrowingScript() throws ScriptInstantiationException {
+		Assertions.assertThrows(ScriptInstantiationException.class, () -> {
 			new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.exceptionThrowing");
 		});
 	}
 
 	@Test
-	void testErrorThrowingScript() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		Assertions.assertThrows(InvocationTargetException.class, () -> {
+	void testErrorThrowingScript() throws ScriptInstantiationException {
+		Assertions.assertThrows(ScriptInstantiationException.class, () -> {
 			new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.errorThrowing");
 		});
 	}
 
 	@Test
-	void testNoCorrectConstructor() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		Assertions.assertThrows(NoSuchMethodException.class, () -> {
+	void testNoCorrectConstructor() throws ScriptInstantiationException {
+		Assertions.assertThrows(ScriptInstantiationException.class, () -> {
 			new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.noCorrectConstructor");
 		});
+	}
+
+	@Test
+	void testAbstractSuperClass() throws ScriptInstantiationException {
+		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.abstractSuperClass");
+		assertEquals(1, migrater.getSortedScripts().size());
+		assertEquals(
+			de.johannes_rabauer.micromigration.migrater.scripts.abstractSuperClass.ValidScript.class, 
+			migrater.getSortedScripts().first().getClass()
+		);
+	}
+
+	@Test
+	void testReflectiveVersion() throws ScriptInstantiationException {
+		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.reflectiveVersion");
+		assertEquals(1, migrater.getSortedScripts().size());
+		assertEquals(
+			de.johannes_rabauer.micromigration.migrater.scripts.reflectiveVersion.v1_ValidScript.class, 
+			migrater.getSortedScripts().first().getClass()
+		);
+	}
+
+	@Test
+	void testReflectiveSuperClass() throws ScriptInstantiationException {
+		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.abstractSuperClass");
+		assertEquals(1, migrater.getSortedScripts().size());
+		assertEquals(
+			de.johannes_rabauer.micromigration.migrater.scripts.abstractReflectiveSuperClass.v1_ValidScript.class, 
+			migrater.getSortedScripts().first().getClass()
+		);
 	}
 }
