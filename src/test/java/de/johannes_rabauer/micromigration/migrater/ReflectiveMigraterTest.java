@@ -1,6 +1,6 @@
 package de.johannes_rabauer.micromigration.migrater;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.InvocationTargetException;
 
