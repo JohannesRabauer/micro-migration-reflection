@@ -90,7 +90,7 @@ class ReflectiveMigraterTest
 
 	@Test
 	void testReflectiveSuperClass() throws ScriptInstantiationException {
-		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.abstractSuperClass");
+		ReflectiveMigrater migrater = new ReflectiveMigrater("de.johannes_rabauer.micromigration.migrater.scripts.abstractReflectiveSuperClass");
 		assertEquals(1, migrater.getSortedScripts().size());
 		assertEquals(
 			de.johannes_rabauer.micromigration.migrater.scripts.abstractReflectiveSuperClass.v1_ValidScript.class, 

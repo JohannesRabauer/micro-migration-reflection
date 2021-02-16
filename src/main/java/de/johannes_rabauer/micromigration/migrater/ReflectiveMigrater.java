@@ -1,10 +1,14 @@
 package de.johannes_rabauer.micromigration.migrater;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.TreeSet;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import de.johannes_rabauer.micromigration.scripts.MigrationScript;
 
@@ -29,11 +33,21 @@ public class ReflectiveMigrater extends AbstractMigrater
 	@SuppressWarnings("rawtypes")
 	public ReflectiveMigrater(final String packagePath) throws ScriptInstantiationException 
 	{
-		final Reflections reflections = new Reflections(packagePath, new SubTypesScanner());
+		Reflections reflections = new Reflections(
+			new ConfigurationBuilder()
+				.setUrls(ClasspathHelper.forPackage(packagePath))
+				.setScanners(new SubTypesScanner())
+				//I don't get why you have to filter again, but if you don't, super-packages will get included
+				.filterInputsBy(new FilterBuilder().includePackage(packagePath))
+		);
 		
 		for (Class<? extends MigrationScript> scriptClass : reflections.getSubTypesOf(MigrationScript.class)) 
 		{
-			this.sortedScripts.add(instanciateClass(scriptClass));
+			//Only instanciate non abstract classes
+			if(!Modifier.isAbstract(scriptClass.getModifiers()))
+			{
+				this.sortedScripts.add(instanciateClass(scriptClass));
+			}
 		}
 	}
 
