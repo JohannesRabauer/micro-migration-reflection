@@ -46,7 +46,9 @@ public class ReflectiveMigrater extends AbstractMigrater
 			//Only instanciate non abstract classes
 			if(!Modifier.isAbstract(scriptClass.getModifiers()))
 			{
-				this.sortedScripts.add(instanciateClass(scriptClass));
+				MigrationScript<?> instanciatedScript = instanciateClass(scriptClass);
+				checkIfVersionIsAlreadyRegistered(instanciatedScript);
+				this.sortedScripts.add(instanciatedScript);
 			}
 		}
 	}
